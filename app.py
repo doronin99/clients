@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
-from PIL import Image
-from main import open_data, preprocess_data, split_data, load_model_and_predict
+from main import open_data, preprocess_data, fit_and_save_model, load_model_and_predict
 
 
 def process_main_page():
@@ -41,15 +40,14 @@ def process_side_bar_inputs():
     user_input_df = sidebar_input_features()
 
     train_df = open_data()
-    train_X_df, _ = split_data(train_df)
-    full_X_df = pd.concat((user_input_df, train_X_df), axis=0)
-    preprocessed_X_df = preprocess_data(full_X_df, test=False)
+    train_X_df, train_y_df = preprocess_data(train_df)
+    fit_and_save_model(train_X_df, train_y_df, path="model_weights.mw")
 
-    user_X_df = preprocessed_X_df[:1]
+    user_X_df = preprocess_data(user_input_df, test=False)
     write_user_data(user_X_df)
 
-    prediction, prediction_probas = load_model_and_predict(user_X_df)
-    write_prediction(prediction, prediction_probas)
+    #prediction, prediction_probas = load_model_and_predict(user_X_df)
+    #write_prediction(prediction, prediction_probas)
 
 
 def sidebar_input_features():
@@ -77,9 +75,6 @@ def sidebar_input_features():
     inflight_service = st.sidebar.slider("Сервис в полете", min_value=1, max_value=5, value=5, step=1)
     cleanliness = st.sidebar.slider("Чистота", min_value=1, max_value=5, value=5, step=1)
 
-
-
-
     translatetion = {
         "Мужской": "Male",
         "Женский": "Female",
@@ -90,6 +85,15 @@ def sidebar_input_features():
         "Бизнес": "Business",
         "Эко": "Eco",
         "Эко+": "Eco Plus",
+    }
+
+    data = {
+        "Gender": translatetion[gender],
+        "Age": age,
+        "Customer Type": translatetion[customer_type],
+        "Type of Travel": translatetion[type_of_travel],
+        "Class": translatetion[clas],
+        "Flight Distance": flight_distance,
 
         'Inflight wifi service': inflight_wifi_service,
         'Departure/Arrival time convenient': departure_arrival_time_convenient,
@@ -105,15 +109,6 @@ def sidebar_input_features():
         'Checkin service': checkin_service,
         'Inflight service': inflight_service,
         'Cleanliness': cleanliness,
-    }
-
-    data = {
-        "Gender": translatetion[gender],
-        "Age": age,
-        "Customer Type": translatetion[customer_type],
-        "Type of Travel": translatetion[type_of_travel],
-        "Class": translatetion[clas],
-        "Flight Distance": flight_distance
     }
 
     df = pd.DataFrame(data, index=[0])

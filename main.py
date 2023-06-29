@@ -68,7 +68,6 @@ def preprocess_data(df: pd.DataFrame, test=True):
     X_df = pd.concat([X_df.drop(['Class'], axis=1),
                    OneHotEncoder().fit_transform(X_df['Class']).drop(['Class_1'], axis=1)],
                   axis=1)
-    X_df.head()
 
     ss = MinMaxScaler()
     ss.fit(X_df)
@@ -99,10 +98,7 @@ def load_model_and_predict(df, path="model_weights.mw"):
         model = load(file)
 
     prediction = model.predict(df)[0]
-    # prediction = np.squeeze(prediction)
-
     prediction_proba = model.predict_proba(df)[0]
-    # prediction_proba = np.squeeze(prediction_proba)
 
     encode_prediction_proba = {
         0: "Полет понравился в вероятностью",
