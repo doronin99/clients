@@ -1,4 +1,4 @@
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 from category_encoders.one_hot import OneHotEncoder
@@ -80,7 +80,7 @@ def preprocess_data(df: pd.DataFrame, test=True):
 
 
 def fit_and_save_model(X_df, y_df, path="model_weights.mw"):
-    model = DecisionTreeClassifier()
+    model = RandomForestClassifier()
     model.fit(X_df, y_df)
 
     test_prediction = model.predict(X_df)
