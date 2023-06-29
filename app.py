@@ -44,10 +44,10 @@ def process_side_bar_inputs():
     fit_and_save_model(train_X_df, train_y_df, path="model_weights.mw")
 
     user_X_df = preprocess_data(user_input_df, test=False)
-    write_user_data(user_X_df)
+    write_user_data(user_input_df)
 
-    #prediction, prediction_probas = load_model_and_predict(user_X_df)
-    #write_prediction(prediction, prediction_probas)
+    prediction, prediction_probas = load_model_and_predict(user_X_df)
+    write_prediction(prediction, prediction_probas)
 
 
 def sidebar_input_features():
