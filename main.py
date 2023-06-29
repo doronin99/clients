@@ -11,19 +11,17 @@ def split_data(df: pd.DataFrame):
     y = df['satisfaction']
     return X, y
 
+
 def open_data(path="clients.csv"):
     df = pd.read_csv(path)
     return df
+
 
 def preprocess_data(df: pd.DataFrame, test=True):
 
     df.dropna(subset=filter(lambda x: x not in ['Gender', 'Age', 'satisfaction'],
                             df.columns),
               inplace=True) # Удаляем строки с пропущенными значениями во всех признаках, кроме Age и Gender
-
-    # Удаляем строки с пропущенными значениями таргета и заменяем значение neutral or dissatisfied на 1, а satisfied - на 0
-    df = df[df['satisfaction'] != '-']
-    df['satisfaction'] = df['satisfaction'].apply(lambda x: 1 if x == 'neutral or dissatisfied' else 0)
 
     # Кодируем значение признаков Gender, Customer Type, Type of Travel нулем и единицей
     df['Gender'] = df['Gender'].apply(lambda x: 1 if x == 'Female' else 0)
@@ -59,6 +57,9 @@ def preprocess_data(df: pd.DataFrame, test=True):
     df[list(filter(lambda x: x in selected_cols, df.columns))] = df[list(filter(lambda x: x in selected_cols, df.columns))].astype("category")
 
     if test:
+        # Удаляем строки с пропущенными значениями таргета и заменяем значение neutral or dissatisfied на 1, а satisfied - на 0
+        df = df[df['satisfaction'] != '-']
+        df['satisfaction'] = df['satisfaction'].apply(lambda x: 1 if x == 'neutral or dissatisfied' else 0)
         X_df, y_df = split_data(df)
     else:
         X_df = df
@@ -78,6 +79,7 @@ def preprocess_data(df: pd.DataFrame, test=True):
     else:
         return X_df
 
+
 def fit_and_save_model(X_df, y_df, path="data/model_weights.mw"):
     model = RandomForestClassifier()
     model.fit(X_df, y_df)
@@ -90,6 +92,7 @@ def fit_and_save_model(X_df, y_df, path="data/model_weights.mw"):
         dump(model, file)
 
     print(f"Model was saved to {path}")
+
 
 def load_model_and_predict(df, path="data/model_weights.mw"):
     with open(path, "rb") as file:
@@ -119,6 +122,7 @@ def load_model_and_predict(df, path="data/model_weights.mw"):
     prediction = encode_prediction[prediction]
 
     return prediction, prediction_df
+
 
 if __name__ == "__main__":
     df = open_data()
