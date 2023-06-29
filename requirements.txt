@@ -49,4 +49,4 @@ urllib3==1.26.15
 validators==0.20.0
 watchdog==3.0.0
 zipp==3.15.0
-category_encoders=2.6.1
+category_encoders==2.6.1
