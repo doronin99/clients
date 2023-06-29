@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from main import open_data, preprocess_data, fit_and_save_model, load_model_and_predict
+from main import open_data, split_data, preprocess_data, fit_and_save_model, load_model_and_predict
 
 
 def process_main_page():
@@ -43,7 +43,10 @@ def process_side_bar_inputs():
     train_X_df, train_y_df = preprocess_data(train_df)
     fit_and_save_model(train_X_df, train_y_df, path="model_weights.mw")
 
-    user_X_df = preprocess_data(user_input_df, test=False)
+    x_df, _ = split_data(train_df)
+    full_X_df = pd.concat((user_input_df, x_df), axis=0)
+    preprocessed_X_df = preprocess_data(full_X_df, test=False)
+    user_X_df = preprocessed_X_df[:1]
     write_user_data(user_input_df)
 
     prediction, prediction_probas = load_model_and_predict(user_X_df)

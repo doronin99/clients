@@ -64,10 +64,10 @@ def preprocess_data(df: pd.DataFrame, test=True):
     else:
         X_df = df
 
-    #
-    X_df = pd.concat([X_df.drop(['Class'], axis=1),
-                   OneHotEncoder().fit_transform(X_df['Class']).drop(['Class_1'], axis=1)],
-                  axis=1)
+    one_hot = pd.get_dummies(X_df['Class'])
+    X_df = X_df.drop(columns=['Class'], axis=1)
+    one_hot = one_hot.drop(one_hot.columns[0], axis=1)
+    X_df = X_df.join(one_hot)
 
     ss = MinMaxScaler()
     ss.fit(X_df)
