@@ -7,18 +7,15 @@ import pandas as pd
 
 
 def split_data(df: pd.DataFrame):
-    X = df.drop(['satisfaction'], axis=1)
+    X = df.drop(['satisfaction', 'id', 'Departure Delay in Minutes', 'Arrival Delay in Minutes'], axis=1)
     y = df['satisfaction']
     return X, y
-
 
 def open_data(path="clients.csv"):
     df = pd.read_csv(path)
     return df
 
-
 def preprocess_data(df: pd.DataFrame, test=True):
-    df.drop(['id'], axis=1, inplace=True) # Удаляем столбец id
 
     df.dropna(subset=filter(lambda x: x not in ['Gender', 'Age', 'satisfaction'],
                             df.columns),
@@ -33,14 +30,11 @@ def preprocess_data(df: pd.DataFrame, test=True):
     df['Customer Type'] = df['Customer Type'].apply(lambda x: 1 if x == 'Loyal Customer' else 0)
     df['Type of Travel'] = df['Type of Travel'].apply(lambda x: 1 if x == 'Business travel' else 0)
 
-
     df['Age'].fillna(df['Age'].mean(), inplace=True) # Заменяем пропущенные значения в столбце Age средним значением
 
     # Удаляем строки с выбросами для признаков Age и Flight Distance, т.е. со значениями >80 и >4000 соответственно
     df = df[df['Age'] < 80]
     df = df[df['Flight Distance'] < 4000]
-
-    df.drop(['Departure Delay in Minutes', 'Arrival Delay in Minutes'], axis=1, inplace=True) #Удаляем столбцы Departure Delay in Minutes и Arrival Delay in Minutes
 
     # Удаляем выборсы из категориальных переменных и приводим их к соответствующему типу
     selected_cols = ['Inflight wifi service',
@@ -84,7 +78,6 @@ def preprocess_data(df: pd.DataFrame, test=True):
     else:
         return X_df
 
-
 def fit_and_save_model(X_df, y_df, path="data/model_weights.mw"):
     model = RandomForestClassifier()
     model.fit(X_df, y_df)
@@ -97,7 +90,6 @@ def fit_and_save_model(X_df, y_df, path="data/model_weights.mw"):
         dump(model, file)
 
     print(f"Model was saved to {path}")
-
 
 def load_model_and_predict(df, path="data/model_weights.mw"):
     with open(path, "rb") as file:
@@ -127,7 +119,6 @@ def load_model_and_predict(df, path="data/model_weights.mw"):
     prediction = encode_prediction[prediction]
 
     return prediction, prediction_df
-
 
 if __name__ == "__main__":
     df = open_data()
