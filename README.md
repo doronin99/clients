@@ -1,4 +1,4 @@
-# clients
+# Clients
 This project demonstrates how to present machine learning solution as a web application using Streamlit framework. The data used in this repo is the Airlines Customer satisfaction dataset.
 
 Try app by the link: https://clients.streamlit.app/
