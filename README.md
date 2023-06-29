@@ -4,7 +4,8 @@ This project demonstrates how to present machine learning solution as a web appl
 Try app by the link: https://clients.streamlit.app/
 
 ## Files
-`app.py`: streamlit app file
-`model.py`: script for generating the Random Forest classifier model
-'clients.csv`: data file
-`requirements.txt`: package requirements files
+`app.py`: streamlit app file<br>
+`model.py`: script for generating the Random Forest classifier model<br>
+`clients.csv`: data file<br>
+`requirements.txt`: package requirements files<br>
+`clients.ipynb`: jupyter notebook with describing of preprocessing and model fitting<br>
