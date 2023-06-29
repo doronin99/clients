@@ -101,8 +101,8 @@ def load_model_and_predict(df, path="model_weights.mw"):
     prediction_proba = model.predict_proba(df)[0]
 
     encode_prediction_proba = {
-        0: "Полет понравился в вероятностью",
-        1: "Полет не понравился в вероятностью"
+        0: "Полет понравился с вероятностью",
+        1: "Полет не понравился с вероятностью"
     }
 
     encode_prediction = {
