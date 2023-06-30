@@ -2,19 +2,16 @@ import pandas as pd
 import streamlit as st
 from main import open_data, split_data, preprocess_data, fit_and_save_model, load_model_and_predict
 
-
 def process_main_page():
     show_main_page()
     process_side_bar_inputs()
 
 def show_main_page():
-
     st.set_page_config(
         layout="wide",
         initial_sidebar_state="auto",
         page_title="Clients",
     )
-
     st.write(
         """
         # Задача прогноза удовлетворенности клиента полетом
@@ -62,7 +59,6 @@ def sidebar_input_features():
     clas = st.sidebar.selectbox("Класс", ("Бизнес", "Эко", "Эко+"))
     flight_distance = st.sidebar.slider("Дальность перелета (в милях)", min_value=50, max_value=4000, value=500,
                             step=50)
-
     inflight_wifi_service = st.sidebar.slider("Качество работы Wi-Fi в полете", min_value=1, max_value=5, value=5, step=1)
     departure_arrival_time_convenient = st.sidebar.slider("Удобство времени отрпавления и прибытия", min_value=1, max_value=5, value=5, step=1)
     ease_of_online_booking = st.sidebar.slider("Удобство онлайн бронирования", min_value=1, max_value=5, value=5, step=1)
