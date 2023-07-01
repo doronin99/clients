@@ -5,36 +5,38 @@ from category_encoders.one_hot import OneHotEncoder
 from pickle import dump, load
 import pandas as pd
 
-
-def split_data(df: pd.DataFrame):
+# Function splits a df into features and a target
+def split_data(df: pd.DataFrame) -> (pd.DataFrame, pd.Series):
     X = df.drop(['satisfaction', 'id', 'Departure Delay in Minutes', 'Arrival Delay in Minutes'], axis=1)
     y = df['satisfaction']
     return X, y
 
-
-def open_data(path="clients.csv"):
+# Function reads csv file and turn it into df
+def open_data(path="clients.csv") -> pd.DataFrame:
     df = pd.read_csv(path)
     return df
 
+# Function preprocesses df for using it in model
+def preprocess_data(df: pd.DataFrame, test=True) -> (pd.DataFrame, pd.Series):
 
-def preprocess_data(df: pd.DataFrame, test=True):
-
+    # Deleting rows with missing values ​​in all features, except Age and Gender
     df.dropna(subset=filter(lambda x: x not in ['Gender', 'Age', 'satisfaction'],
                             df.columns),
-              inplace=True) # Удаляем строки с пропущенными значениями во всех признаках, кроме Age и Gender
-
-    # Кодируем значение признаков Gender, Customer Type, Type of Travel нулем и единицей
+              inplace=True)
+    
+    # Encoding the values ​​of Gender, Customer Type, Type of Travel by 0 and 1
     df['Gender'] = df['Gender'].apply(lambda x: 1 if x == 'Female' else 0)
     df['Customer Type'] = df['Customer Type'].apply(lambda x: 1 if x == 'Loyal Customer' else 0)
     df['Type of Travel'] = df['Type of Travel'].apply(lambda x: 1 if x == 'Business travel' else 0)
 
-    df['Age'].fillna(df['Age'].mean(), inplace=True) # Заменяем пропущенные значения в столбце Age средним значением
+    # Replacing Age missing values by the average
+    df['Age'].fillna(df['Age'].mean(), inplace=True)
 
-    # Удаляем строки с выбросами для признаков Age и Flight Distance, т.е. со значениями >80 и >4000 соответственно
+    # Removing Age and Flight Distance outliers (with >80 and >4000 values resp.)
     df = df[df['Age'] < 80]
     df = df[df['Flight Distance'] < 4000]
 
-    # Удаляем выборсы из категориальных переменных и приводим их к соответствующему типу
+    # Removing outliers from other categorical features and cast them to the appropriate type
     selected_cols = ['Inflight wifi service',
                      'Departure/Arrival time convenient',
                      'Ease of Online booking',
@@ -49,26 +51,29 @@ def preprocess_data(df: pd.DataFrame, test=True):
                      'Checkin service',
                      'Inflight service',
                      'Cleanliness']
-
+    
     for col in selected_cols:
         df = df[df[col] <= 5]
         df = df[df[col] >= 1]
 
-    df[list(filter(lambda x: x in selected_cols, df.columns))] = df[list(filter(lambda x: x in selected_cols, df.columns))].astype("category")
+    df[selected_cols] = df[selected_cols].astype("category")
+    #df[list(filter(lambda x: x in selected_cols, df.columns))] = df[list(filter(lambda x: x in selected_cols, df.columns))].astype("category")
 
     if test:
-        # Удаляем строки с пропущенными значениями таргета и заменяем значение neutral or dissatisfied на 1, а satisfied - на 0
+        # Deleting rows with missing target values and replacing neutral or dissatisfied by 1 and satisfied by 0
         df = df[df['satisfaction'] != '-']
         df['satisfaction'] = df['satisfaction'].apply(lambda x: 1 if x == 'neutral or dissatisfied' else 0)
         X_df, y_df = split_data(df)
     else:
         X_df = df
 
+    # Using OHE to encode Class column
     one_hot = pd.get_dummies(X_df['Class'])
     X_df = X_df.drop(columns=['Class'], axis=1)
     one_hot = one_hot.drop(one_hot.columns[0], axis=1)
     X_df = X_df.join(one_hot)
 
+    # Scaling features by using MinMaxScaler
     ss = MinMaxScaler()
     ss.fit(X_df)
     X_df = pd.DataFrame(ss.transform(X_df), columns=X_df.columns)
@@ -78,8 +83,8 @@ def preprocess_data(df: pd.DataFrame, test=True):
     else:
         return X_df
 
-
-def fit_and_save_model(X_df, y_df, path="model_weights.mw"):
+# Function creates Random Forest Classifier and saves this model in selected path
+def fit_and_save_model(X_df: pd.DataFrame, y_df: pd.Series, path="model_weights.mw") -> None:
     model = RandomForestClassifier()
     model.fit(X_df, y_df)
 
@@ -92,8 +97,8 @@ def fit_and_save_model(X_df, y_df, path="model_weights.mw"):
 
     print(f"Model was saved to {path}")
 
-
-def load_model_and_predict(df, path="model_weights.mw"):
+# Function loads model and make the prediction using ones
+def load_model_and_predict(df: pd.DataFrame, path="model_weights.mw") -> (str, pd.DataFrame):
     with open(path, "rb") as file:
         model = load(file)
 
